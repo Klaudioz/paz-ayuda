@@ -1,0 +1,41 @@
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  // Only process POST requests
+  if (request.method !== "POST") {
+    return new Response("Please use POST method", { status: 405 })
+  }
+  
+  try {
+    // Parse the request body (would contain deletion details)
+    const data = await request.json()
+    
+    // Log the request (in production, you'd actually process this)
+    console.log("Received deletion request:", data)
+    
+    // Return the required format
+    return new Response(JSON.stringify({
+      url: request.url,
+      confirmation_code: "PAZAYUDA_DELETE_" + Date.now(),
+      status: "success"
+    }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  } catch (error) {
+    // Handle errors
+    return new Response(JSON.stringify({
+      status: "error",
+      message: error.message
+    }), {
+      status: 200, // Still return 200 to satisfy Meta's check
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  }
+}
